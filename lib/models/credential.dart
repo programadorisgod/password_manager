@@ -1,8 +1,8 @@
 class Credential {
   final int? id;
-  final int userId;
+  int userId;
   final String name;
-  final String encryptedPassword;
+  String encryptedPassword;
   final String description;
 
   Credential({

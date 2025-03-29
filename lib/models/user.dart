@@ -1,12 +1,14 @@
 class User {
-  final int? id;
+  int? id;
   final String email;
   final String masterPassword;
+  final String masterKey;
 
   User({
     this.id,
     required this.email,
     required this.masterPassword,
+    required this.masterKey,
   });
 
   Map<String, dynamic> toMap() {
@@ -14,6 +16,7 @@ class User {
       'id': id,
       'email': email,
       'master_password': masterPassword,
+      'masterKey': masterKey,
     };
   }
 
@@ -22,6 +25,7 @@ class User {
       id: map['id'],
       email: map['email'],
       masterPassword: map['master_password'],
+      masterKey: map['masterKey'],
     );
   }
 } 

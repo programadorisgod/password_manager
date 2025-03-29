@@ -31,7 +31,9 @@ class DatabaseHelper {
       CREATE TABLE users(
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         email TEXT NOT NULL,
-        master_password TEXT NOT NULL
+        master_password TEXT NOT NULL,
+        masterKey TEXT,
+        last_login INTEGER
       )
     ''');
 
@@ -50,7 +52,12 @@ class DatabaseHelper {
   // User operations
   Future<int> insertUser(User user) async {
     final Database db = await database;
-    return await db.insert('users', user.toMap());
+    final now = DateTime.now().millisecondsSinceEpoch;
+    
+    final Map<String, dynamic> userData = user.toMap();
+    userData['last_login'] = now;
+    
+    return await db.insert('users', userData);
   }
 
   Future<User?> getUser(String email) async {
@@ -99,5 +106,17 @@ class DatabaseHelper {
       where: 'id = ?',
       whereArgs: [id],
     );
+  }
+
+  Future<User?> getLastLoggedInUser() async {
+    final db = await database;
+    final List<Map<String, dynamic>> maps = await db.query(
+      'users',
+      orderBy: 'last_login DESC',
+      limit: 1,
+    );
+
+    if (maps.isEmpty) return null;
+    return User.fromMap(maps.first);
   }
 } 

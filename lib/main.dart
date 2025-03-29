@@ -1,10 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+import 'dart:io';
 import 'controllers/auth_controller.dart';
 import 'controllers/credential_controller.dart';
 import 'views/login_view.dart';
 
 void main() {
+  // Inicializar sqflite para Linux
+  if (Platform.isLinux) {
+    sqfliteFfiInit();
+    databaseFactory = databaseFactoryFfi;
+  }
+
   runApp(const MyApp());
 }
 
@@ -13,6 +21,10 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Inicializar los controladores
+    Get.put(AuthController());
+    Get.put(CredentialController());
+
     return GetMaterialApp(
       title: 'Password Manager',
       theme: ThemeData(
@@ -54,10 +66,6 @@ class MyApp extends StatelessWidget {
           ),
         ),
       ),
-      initialBinding: BindingsBuilder(() {
-        Get.put(AuthController());
-        Get.put(CredentialController());
-      }),
       home: const LoginView(),
     );
   }

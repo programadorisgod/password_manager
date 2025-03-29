@@ -142,90 +142,50 @@ class HomeView extends StatelessWidget {
     );
   }
 
-  void _showAddDialog() {
+  Future<void> _showAddDialog() async {
     final nameController = TextEditingController();
     final passwordController = TextEditingController();
     final descriptionController = TextEditingController();
     final credentialController = Get.find<CredentialController>();
 
-    Get.dialog(
+    await Get.dialog(
       AlertDialog(
-        backgroundColor: Colors.black,
-        title: Text(
-          'Add Password',
-          style: TextStyle(color: Colors.white),
-        ),
+        title: Text('Add Password'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             TextField(
               controller: nameController,
-              decoration: InputDecoration(
-                labelText: 'Name',
-                labelStyle: TextStyle(color: Colors.white70),
-              ),
-              style: TextStyle(color: Colors.white),
+              decoration: InputDecoration(labelText: 'Name'),
             ),
-            const SizedBox(height: 8),
             TextField(
               controller: passwordController,
-              decoration: InputDecoration(
-                labelText: 'Password',
-                labelStyle: TextStyle(color: Colors.white70),
-              ),
-              style: TextStyle(color: Colors.white),
+              decoration: InputDecoration(labelText: 'Password'),
               obscureText: true,
             ),
-            const SizedBox(height: 8),
             TextField(
               controller: descriptionController,
-              decoration: InputDecoration(
-                labelText: 'Description',
-                labelStyle: TextStyle(color: Colors.white70),
-              ),
-              style: TextStyle(color: Colors.white),
+              decoration: InputDecoration(labelText: 'Description'),
             ),
           ],
         ),
         actions: [
           TextButton(
             onPressed: () => Get.back(),
-            child: Text(
-              'Cancel',
-              style: TextStyle(color: Colors.blue),
-            ),
+            child: Text('Cancel'),
           ),
-          ElevatedButton(
+          TextButton(
             onPressed: () async {
               try {
-                final success = await credentialController.addCredential(
+                await credentialController.addCredential(
                   nameController.text,
                   passwordController.text,
                   descriptionController.text,
                 );
-                if (success) {
-                  Get.back();
-                  Get.snackbar(
-                    'Success',
-                    'Password added successfully',
-                    backgroundColor: Colors.green,
-                    colorText: Colors.white,
-                  );
-                } else {
-                  Get.snackbar(
-                    'Error',
-                    'Failed to add password',
-                    backgroundColor: Colors.red,
-                    colorText: Colors.white,
-                  );
-                }
+                Get.back();
+                Get.snackbar('Success', 'Password added successfully');
               } catch (e) {
-                Get.snackbar(
-                  'Error',
-                  'Failed to add password: ${e.toString().replaceAll('Exception: ', '')}',
-                  backgroundColor: Colors.red,
-                  colorText: Colors.white,
-                );
+                Get.snackbar('Error', 'Failed to add password: ${e.toString()}');
               }
             },
             child: Text('Add'),
@@ -235,122 +195,83 @@ class HomeView extends StatelessWidget {
     );
   }
 
-  void _showEditDialog(Credential credential) {
+  Future<void> _showEditDialog(Credential credential) async {
     final nameController = TextEditingController(text: credential.name);
     final passwordController = TextEditingController();
     final descriptionController = TextEditingController(text: credential.description);
     final credentialController = Get.find<CredentialController>();
 
-    Get.dialog(
+    await Get.dialog(
       AlertDialog(
-        title: const Text('Edit Password'),
+        title: Text('Edit Password'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             TextField(
               controller: nameController,
-              decoration: const InputDecoration(labelText: 'Name'),
+              decoration: InputDecoration(labelText: 'Name'),
             ),
-            const SizedBox(height: 8),
             TextField(
               controller: passwordController,
-              decoration: const InputDecoration(
-                labelText: 'New Password (leave empty to keep current)',
-              ),
+              decoration: InputDecoration(labelText: 'New Password (leave empty to keep current)'),
               obscureText: true,
             ),
-            const SizedBox(height: 8),
             TextField(
               controller: descriptionController,
-              decoration: const InputDecoration(labelText: 'Description'),
+              decoration: InputDecoration(labelText: 'Description'),
             ),
           ],
         ),
         actions: [
           TextButton(
             onPressed: () => Get.back(),
-            child: const Text('Cancel'),
+            child: Text('Cancel'),
           ),
-          ElevatedButton(
+          TextButton(
             onPressed: () async {
-              final success = await credentialController.updateCredential(
-                credential.id!,
-                nameController.text,
-                passwordController.text.isEmpty ? null : passwordController.text,
-                descriptionController.text,
-              );
-              if (success) {
+              try {
+                if (passwordController.text.isNotEmpty) {
+                  await credentialController.updateCredential(
+                    credential,
+                    passwordController.text,
+                  );
+                }
                 Get.back();
-                Get.snackbar(
-                  'Success',
-                  'Password updated successfully',
-                  snackPosition: SnackPosition.BOTTOM,
-                  backgroundColor: Colors.green,
-                  colorText: Colors.white,
-                );
-              } else {
-                Get.snackbar(
-                  'Error',
-                  'Failed to update password',
-                  snackPosition: SnackPosition.BOTTOM,
-                  backgroundColor: Colors.red,
-                  colorText: Colors.white,
-                );
+                Get.snackbar('Success', 'Password updated successfully');
+              } catch (e) {
+                Get.snackbar('Error', 'Failed to update password');
               }
             },
-            child: const Text('Save'),
+            child: Text('Save'),
           ),
         ],
       ),
     );
   }
 
-  void _showDeleteDialog(Credential credential) {
+  Future<void> _showDeleteDialog(Credential credential) async {
     final credentialController = Get.find<CredentialController>();
     
-    Get.dialog(
+    await Get.dialog(
       AlertDialog(
-        backgroundColor: Colors.black,
-        title: Text(
-          'Delete Password',
-          style: TextStyle(color: Colors.white),
-        ),
-        content: Text(
-          'Are you sure you want to delete this password?',
-          style: TextStyle(color: Colors.white),
-        ),
+        title: Text('Delete Password'),
+        content: Text('Are you sure you want to delete this password?'),
         actions: [
           TextButton(
             onPressed: () => Get.back(),
-            child: Text(
-              'Cancel',
-              style: TextStyle(color: Colors.blue),
-            ),
+            child: Text('Cancel'),
           ),
           TextButton(
             onPressed: () async {
-              Get.back();
               try {
                 await credentialController.deleteCredential(credential.id!);
-                Get.snackbar(
-                  'Success',
-                  'Password deleted successfully',
-                  backgroundColor: Colors.green,
-                  colorText: Colors.white,
-                );
+                Get.back();
+                Get.snackbar('Success', 'Password deleted successfully');
               } catch (e) {
-                Get.snackbar(
-                  'Error',
-                  'Failed to delete password',
-                  backgroundColor: Colors.red,
-                  colorText: Colors.white,
-                );
+                Get.snackbar('Error', 'Failed to delete password');
               }
             },
-            child: Text(
-              'Delete',
-              style: TextStyle(color: Colors.red),
-            ),
+            child: Text('Delete'),
           ),
         ],
       ),
