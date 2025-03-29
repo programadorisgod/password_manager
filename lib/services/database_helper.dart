@@ -2,6 +2,9 @@ import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import '../models/user.dart';
 import '../models/credential.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+import 'dart:io';
+import 'package:path/path.dart' as path;
 
 class DatabaseHelper {
   static final DatabaseHelper _instance = DatabaseHelper._internal();
@@ -18,11 +21,21 @@ class DatabaseHelper {
   }
 
   Future<Database> _initDatabase() async {
-    String path = join(await getDatabasesPath(), 'password_manager.db');
-    return await openDatabase(
-      path,
-      version: 1,
-      onCreate: _onCreate,
+    // Get the system's local share directory
+    final dbPath = Platform.environment['HOME']! + '/.local/share/password_manager';
+    
+    // Create the directory if it doesn't exist
+    await Directory(dbPath).create(recursive: true);
+    
+    // Set the database path
+    final dbFile = path.join(dbPath, 'password_manager.db');
+    
+    return await databaseFactoryFfi.openDatabase(
+      dbFile,
+      options: OpenDatabaseOptions(
+        version: 1,
+        onCreate: _onCreate,
+      ),
     );
   }
 
