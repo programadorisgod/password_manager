@@ -4,6 +4,7 @@ import '../services/database_helper.dart';
 import '../services/encryption_service.dart';
 import 'auth_controller.dart';
 import 'dart:convert';
+import 'package:flutter/material.dart';
 
 class CredentialController extends GetxController {
   final _db = DatabaseHelper();
@@ -190,6 +191,8 @@ class CredentialController extends GetxController {
           message,
           snackPosition: SnackPosition.BOTTOM,
           duration: const Duration(seconds: 5),
+          backgroundColor: Colors.orange,
+          colorText: Colors.white,
         );
       }
       
@@ -199,6 +202,8 @@ class CredentialController extends GetxController {
           'Se importaron $importedCount credencial(es)',
           snackPosition: SnackPosition.BOTTOM,
           duration: const Duration(seconds: 3),
+          backgroundColor: Colors.green,
+          colorText: Colors.white,
         );
       }
       

@@ -433,9 +433,16 @@ class HomeView extends StatelessWidget {
                   throw Exception('Please enter your master password');
                 }
 
+                // Store the data before closing the dialog
+                final data = dataController.text;
+                final password = passwordController.text;
+
+                // Close the import dialog
+                Get.back();
+
                 // Show loading dialog
                 Get.dialog(
-                  const AlertDialog(
+                  AlertDialog(
                     content: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
@@ -447,28 +454,34 @@ class HomeView extends StatelessWidget {
                   ),
                 );
 
-                final success = await credentialController.importCredentials(
-                  dataController.text,
-                  passwordController.text,
+                await credentialController.importCredentials(
+                  data,
+                  password,
                 );
                 
-                Get.back(); // Close loading dialog
-                
-                if (success) {
-                  Get.back(); // Close import dialog
-                  Get.snackbar(
-                    'Success',
-                    'Passwords imported successfully',
-                    snackPosition: SnackPosition.BOTTOM,
-                    backgroundColor: Colors.green,
-                    colorText: Colors.white,
-                  );
+                // Close loading dialog
+                if (Get.isDialogOpen ?? false) {
+                  Get.back();
                 }
+
+                // Show success message
+                Get.snackbar(
+                  'Success',
+                  'Passwords imported successfully',
+                  snackPosition: SnackPosition.BOTTOM,
+                  backgroundColor: Colors.green,
+                  colorText: Colors.white,
+                );
               } catch (e) {
-                Get.back(); // Close loading dialog
+                // Close any open dialogs
+                if (Get.isDialogOpen ?? false) {
+                  Get.back();
+                }
+
+                // Show error message
                 Get.snackbar(
                   'Error',
-                  'Failed to import passwords: ${e.toString().replaceAll('Exception: ', '')}',
+                  e.toString(),
                   snackPosition: SnackPosition.BOTTOM,
                   backgroundColor: Colors.red,
                   colorText: Colors.white,
